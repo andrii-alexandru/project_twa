@@ -127,7 +127,7 @@ class _SampleItemListViewState extends State<SampleItemListView> {
                               await dbHelper.deleteFavorite(breed.name);
                             } else {
                               await dbHelper.insertFavorite(
-                                  FavoriteBreed(id: 0, breedName: breed.name));
+                                  FavoriteBreed(breedName: breed.name));
                             }
                             setState(() {}); // Rebuild to reflect changes
                           },

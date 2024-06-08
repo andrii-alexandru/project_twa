@@ -60,7 +60,6 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (i) {
       return FavoriteBreed(
-        id: maps[i]['id'],
         breedName: maps[i]['breedName'],
       );
     });
