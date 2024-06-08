@@ -1,69 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../settings/settings_view.dart';
-import 'sample_item.dart';
 import 'sample_item_details_view.dart';
 
-/// Displays a list of SampleItems.
-class SampleItemListView extends StatelessWidget {
-  const SampleItemListView({
-    super.key,
-    this.items = const [SampleItem(1), SampleItem(2), SampleItem(3)],
-  });
+class Breed {
+  final String name;
+  final String imageUrl;
+
+  Breed({required this.name, required this.imageUrl});
+
+  factory Breed.fromJson(String name, String imageUrl) {
+    return Breed(name: name, imageUrl: imageUrl);
+  }
+}
+
+class SampleItemListView extends StatefulWidget {
+  const SampleItemListView({super.key});
 
   static const routeName = '/';
 
-  final List<SampleItem> items;
+  @override
+  _SampleItemListViewState createState() => _SampleItemListViewState();
+}
+
+class _SampleItemListViewState extends State<SampleItemListView> {
+  late Future<List<Breed>> futureBreeds;
+
+  @override
+  void initState() {
+    super.initState();
+    futureBreeds = fetchBreeds();
+  }
+
+  Future<List<Breed>> fetchBreeds() async {
+    final response =
+        await http.get(Uri.parse('https://dog.ceo/api/breeds/list/all'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body)['message'];
+      final List<Breed> breeds = [];
+
+      for (var breed in data.keys) {
+        final imageUrl = await fetchBreedImage(breed);
+        breeds.add(Breed.fromJson(breed, imageUrl));
+      }
+
+      return breeds;
+    } else {
+      throw Exception('Failed to load breeds');
+    }
+  }
+
+  Future<String> fetchBreedImage(String breed) async {
+    final response = await http
+        .get(Uri.parse('https://dog.ceo/api/breed/$breed/images/random'));
+
+    if (response.statusCode == 200) {
+      final String imageUrl = json.decode(response.body)['message'];
+      return imageUrl;
+    } else {
+      throw Exception('Failed to load breed image');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Items'),
+        title: const Text('Dog Breeds'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
               Navigator.restorablePushNamed(context, SettingsView.routeName);
             },
           ),
         ],
       ),
+      body: FutureBuilder<List<Breed>>(
+        future: futureBreeds,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No breeds found'));
+          } else {
+            final breeds = snapshot.data!;
+            return ListView.builder(
+              restorationId: 'sampleItemListView',
+              itemCount: breeds.length,
+              itemBuilder: (context, index) {
+                final breed = breeds[index];
 
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'sampleItemListView',
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = items[index];
-
-          return ListTile(
-            title: Text('SampleItem ${item.id}'),
-            leading: const CircleAvatar(
-              // Display the Flutter Logo image asset.
-              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-            ),
-            onTap: () {
-              // Navigate to the details page. If the user leaves and returns to
-              // the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(
-                context,
-                SampleItemDetailsView.routeName,
-              );
-            }
-          );
+                return ListTile(
+                  title: Text(breed.name),
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(breed.imageUrl),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SampleItemDetailsView(breedName: breed.name),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          }
         },
       ),
     );
