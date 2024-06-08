@@ -3,7 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../settings/settings_view.dart';
+import '../sample_feature/favorite_breed.dart';
+import 'data_search.dart';
 import 'sample_item_details_view.dart';
+import '../helpers/database_helper.dart';
 
 class Breed {
   final String name;
@@ -27,6 +30,7 @@ class SampleItemListView extends StatefulWidget {
 
 class _SampleItemListViewState extends State<SampleItemListView> {
   late Future<List<Breed>> futureBreeds;
+  final DatabaseHelper dbHelper = DatabaseHelper();
 
   @override
   void initState() {
@@ -72,6 +76,12 @@ class _SampleItemListViewState extends State<SampleItemListView> {
         title: const Text('Dog Breeds'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(context: context, delegate: DataSearch(futureBreeds));
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.restorablePushNamed(context, SettingsView.routeName);
@@ -95,11 +105,35 @@ class _SampleItemListViewState extends State<SampleItemListView> {
               itemCount: breeds.length,
               itemBuilder: (context, index) {
                 final breed = breeds[index];
-
                 return ListTile(
                   title: Text(breed.name),
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(breed.imageUrl),
+                  ),
+                  trailing: FutureBuilder<bool>(
+                    future: dbHelper.isFavorite(breed.name),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else {
+                        final isFavorite = snapshot.data ?? false;
+                        return IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : null,
+                          ),
+                          onPressed: () async {
+                            if (isFavorite) {
+                              await dbHelper.deleteFavorite(breed.name);
+                            } else {
+                              await dbHelper.insertFavorite(
+                                  FavoriteBreed(id: 0, breedName: breed.name));
+                            }
+                            setState(() {}); // Rebuild to reflect changes
+                          },
+                        );
+                      }
+                    },
                   ),
                   onTap: () {
                     Navigator.push(

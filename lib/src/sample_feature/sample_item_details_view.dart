@@ -44,7 +44,7 @@ class _SampleItemDetailsViewState extends State<SampleItemDetailsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.breedName} Details'),
+        title: Text(widget.breedName.toUpperCase()),
       ),
       body: FutureBuilder<String>(
         future: futureImageUrl,
@@ -59,9 +59,9 @@ class _SampleItemDetailsViewState extends State<SampleItemDetailsView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(widget.breedName,
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  const SizedBox(height: 20),
+                  // Text(widget.breedName,
+                  //     style: Theme.of(context).textTheme.bodyMedium),
+                  // const SizedBox(height: 20),
                   Image.network(imageUrl),
                   const SizedBox(height: 20),
                   ElevatedButton(
