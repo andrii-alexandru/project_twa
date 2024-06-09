@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import '../settings/settings_view.dart';
 import '../sample_feature/favorite_breed.dart';
+import '../sample_feature/favorite_breeds_view.dart';
 import 'data_search.dart';
 import 'sample_item_details_view.dart';
 import '../helpers/database_helper.dart';
@@ -79,6 +80,12 @@ class _SampleItemListViewState extends State<SampleItemListView> {
             icon: const Icon(Icons.search),
             onPressed: () {
               showSearch(context: context, delegate: DataSearch(futureBreeds));
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            onPressed: () {
+              Navigator.pushNamed(context, FavoriteBreedsView.routeName);
             },
           ),
           IconButton(
