@@ -17,6 +17,7 @@ dependencies:
   http: ^1.2.1
   path: ^1.9.0
   sqflite: ^2.3.3+1
+  flutter_native_splash: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -32,4 +33,13 @@ flutter:
 
   assets:
     # Add assets from the images directory to the application.
-    - assets/images/
+    - assets/images/splash.png
+
+flutter_native_splash:
+  color: "#ffffff" # Background color of the splash screen
+  image: assets/images/splash.png # Path to your splash screen image
+  android: true
+  ios: true
+  android_gravity: center
+  ios_content_mode: scaleAspectFit # Adjusted to scaleAspectFit for experimentation
+  fullscreen: false 

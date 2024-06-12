@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -37,6 +38,10 @@ class _SampleItemListViewState extends State<SampleItemListView> {
   void initState() {
     super.initState();
     futureBreeds = fetchBreeds();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      FlutterNativeSplash.remove();
+    });
   }
 
   Future<List<Breed>> fetchBreeds() async {
@@ -51,7 +56,6 @@ class _SampleItemListViewState extends State<SampleItemListView> {
         final imageUrl = await fetchBreedImage(breed);
         breeds.add(Breed.fromJson(breed, imageUrl));
       }
-
       return breeds;
     } else {
       throw Exception('Failed to load breeds');
