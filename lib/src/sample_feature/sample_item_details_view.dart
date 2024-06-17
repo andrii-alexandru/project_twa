@@ -29,7 +29,8 @@ class SampleItemDetailsViewState extends State<SampleItemDetailsView> {
     );
 
     if (response.statusCode == 200) {
-      final List<String> imageUrls = List<String>.from(json.decode(response.body)['message']);
+      final List<String> imageUrls =
+          List<String>.from(json.decode(response.body)['message']);
       return imageUrls;
     } else {
       throw Exception('Failed to load breed images');
@@ -54,12 +55,15 @@ class SampleItemDetailsViewState extends State<SampleItemDetailsView> {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CarouselSlider(
                     options: CarouselOptions(
                       autoPlay: false,
                       enlargeCenterPage: true,
                       viewportFraction: 0.8,
+                      // infinite loop
+                      enableInfiniteScroll: false,
                       //aspectRatio: 1.0,
                       //autoPlayInterval: Duration(seconds: 3),
                     ),
@@ -72,7 +76,8 @@ class SampleItemDetailsViewState extends State<SampleItemDetailsView> {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: NetworkImage(url),
-                                fit: BoxFit.fill, // will fill the widthxheight box; may distort images
+                                fit: BoxFit
+                                    .fill, // will fill the widthxheight box; may distort images
                               ),
                             ),
                           );
@@ -81,12 +86,12 @@ class SampleItemDetailsViewState extends State<SampleItemDetailsView> {
                     }).toList(),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => setState(() {
-                      futureImageUrls = fetchBreedImages(widget.breedName, 5);
-                    }),
-                    child: const Text('Fetch New Images'),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () => setState(() {
+                  //     futureImageUrls = fetchBreedImages(widget.breedName, 5);
+                  //   }),
+                  //   child: const Text('Fetch New Images'),
+                  // ),
                 ],
               ),
             );
