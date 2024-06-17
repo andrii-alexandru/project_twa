@@ -59,10 +59,18 @@ class _SampleItemDetailsViewState extends State<SampleItemDetailsView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Text(widget.breedName,
-                  //     style: Theme.of(context).textTheme.bodyMedium),
-                  // const SizedBox(height: 20),
-                  Image.network(imageUrl),
+                  // resizing image
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(imageUrl),
+                          fit: BoxFit
+                              .fill
+                          ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: refetchImage,
